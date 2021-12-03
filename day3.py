@@ -1,18 +1,4 @@
-data = '''00100
-11110
-10110
-10111
-10101
-01111
-00111
-11100
-10000
-11001
-00010
-01010'''.split('\n')
-
-data = open('day3.txt')
-inp = [line.rstrip() for line in data]
+inp = [line.rstrip() for line in open('day3.txt')]
 
 def most_common(inp, i):
     return sum(1 for n in inp if n[i] == '1') \
