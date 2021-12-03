@@ -15,10 +15,10 @@ e = number(least_common(inp, i) for i in range(N))
 print(g * e)
 
 # part 2
-def distill(inp, bit):
+def winner(inp, bit):
     i = 0
     while len(inp) > 1:
         inp = [n for n in inp if n[i] == bit(inp, i)]
         i += 1
     return number(inp[0])
-print(distill(inp, most_common) * distill(inp, least_common))
+print(winner(inp, most_common) * winner(inp, least_common))
