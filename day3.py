@@ -6,7 +6,7 @@ def most_common(inp, i):
 def least_common(inp, i):
     return int(not most_common(inp, i))
 def number(bits):
-    return int(''.join(str(bit) for bit in bits), 2)
+    return int(''.join(map(str, bits)), 2)
 
 # part 1
 N = len(inp[0])
