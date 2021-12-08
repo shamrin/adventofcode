@@ -14,10 +14,10 @@ gcafb gcf dcaebfg ecagb gf abcdeg gaef cafbge fdbac fegbdc | fgae cfgab fg bagce
 from itertools import permutations
 
 inp = open('day8.txt').read()
-lines = [[s.strip().split(' ') for s in line.split('|')] for line in inp.split('\n')]
+D = [[s.strip().split(' ') for s in line.split('|')] for line in inp.split('\n')]
 
 # part 1
-print(sum(1 for _, output in lines for o in output if len(o) in (2,3,4,7)))
+print(sum(1 for _, outputs in D for output in outputs if len(output) in (2,3,4,7)))
 
 # part 2
 digits = {
@@ -33,13 +33,13 @@ digits = {
     'abcdfg': '9',
 }
 def ordered(s): return ''.join(sorted(s))
-lines = [([ordered(p) for p in patterns], [ordered(o) for o in output]) for patterns, output in lines]
+D = [([ordered(p) for p in patterns], [ordered(o) for o in output]) for patterns, output in D]
 results = []
-for patterns, outputs in lines:
-    for combination in permutations('abcdefg'):
-        xy = dict(zip(combination, 'abcdefg'))
-        if all(ordered(xy[p] for p in pattern) in digits for pattern in patterns):
-            results.append(''.join(digits[ordered(xy[o] for o in output)] for output in outputs))
+for patterns, outputs in D:
+    for permutation in permutations('abcdefg'):
+        permute = dict(zip(permutation, 'abcdefg'))
+        if all(ordered(permute[p] for p in pattern) in digits for pattern in patterns):
+            results.append(''.join(digits[ordered(permute[o] for o in output)] for output in outputs))
 
 # part 1 second solution
 print(sum(r.count(d) for r in results for d in '1478'))
