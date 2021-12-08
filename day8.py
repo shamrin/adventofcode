@@ -17,18 +17,7 @@ inp = open('day8.txt').read()
 lines = [[s.strip().split(' ') for s in line.split('|')] for line in inp.split('\n')]
 
 # part 1
-n = 0
-for patterns, output in lines:
-    for o in output:
-        if len(o) == 2: #1
-            n += 1
-        if len(o) == 4: #4
-            n += 1
-        if len(o) == 3: #7
-            n += 1
-        if len(o) == 7: #8
-            n += 1
-print(n)
+print(sum(1 for _, output in lines for o in output if len(o) in (2,3,4,7)))
 
 # part 2
 digits = {
