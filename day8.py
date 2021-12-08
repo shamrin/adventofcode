@@ -32,16 +32,16 @@ print(n)
 
 # part 2
 digits = {
-    'abcefg': 0,
-    'cf': 1,
-    'acdeg': 2,
-    'acdfg': 3,
-    'bcdf': 4,
-    'abdfg': 5,
-    'abdefg': 6,
-    'acf': 7,
-    'abcdefg': 8,
-    'abcdfg': 9,
+    'abcefg': '0',
+    'cf': '1',
+    'acdeg': '2',
+    'acdfg': '3',
+    'bcdf': '4',
+    'abdfg': '5',
+    'abdefg': '6',
+    'acf': '7',
+    'abcdefg': '8',
+    'abcdfg': '9',
 }
 def ordered(s): return ''.join(sorted(s))
 lines = [([ordered(p) for p in patterns], [ordered(o) for o in output]) for patterns, output in lines]
@@ -50,9 +50,9 @@ for patterns, outputs in lines:
     for combination in permutations('abcdefg'):
         xy = dict(zip(combination, 'abcdefg'))
         if all(ordered(xy[p] for p in pattern) in digits for pattern in patterns):
-            results.append(int(''.join(str(digits[ordered(xy[o] for o in output)]) for output in outputs)))
+            results.append(''.join(digits[ordered(xy[o] for o in output)] for output in outputs))
 
 # part 1 second solution
-print(sum(str(r).count(d) for r in results for d in '1478'))
+print(sum(r.count(d) for r in results for d in '1478'))
 # part 2 solution
-print(sum(results))
+print(sum(map(int, results)))
