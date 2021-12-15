@@ -9,6 +9,7 @@ python = "^3.9"
 jupyter = "^1.0.0"
 pytesseract = "^0.3.8"
 matplotlib = "^3.5.1"
+ipympl = "^0.8.2"
 
 [tool.poetry.dev-dependencies]
 
