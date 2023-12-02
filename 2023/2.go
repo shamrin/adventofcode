@@ -2,10 +2,10 @@ package main
 
 import (
 	"fmt"
+	"log"
 	"os"
 	"strconv"
 	"strings"
-	"log"
 )
 
 type Draw map[string]int
