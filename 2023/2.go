@@ -7,62 +7,34 @@ import (
 	"strings"
 )
 
-type Spec struct {
-	n int
-	color string
-}
+type Draw map[string]int
 
-type Bag struct {
-	red int
-	green int
-	blue int
-}
-
-func possible(bag Bag, game [][]Spec) bool {
-	for _, draw := range(game) {
-		for _, spec := range(draw) {
-			switch spec.color {
-			case "red":
-				if spec.n > bag.red {
-					return false
-				}
-			case "green":
-				if spec.n > bag.green {
-					return false
-				}
-			case "blue":
-				if spec.n > bag.blue {
-					return false
-				}
-			default:
-				panic("unknown color")
+func possible(bag Draw, game []Draw) bool {
+	for _, draw := range game {
+		for color, n := range draw {
+			if n > bag[color] {
+				return false
 			}
 		}
 	}
 	return true
 }
 
-func minBag(game [][]Spec) Bag {
-	var bag Bag
-	for _, draw := range(game) {
-		for _, spec := range(draw) {
-			switch spec.color {
-			case "red":
-				bag.red = max(bag.red, spec.n)
-			case "green":
-				bag.green = max(bag.green, spec.n)
-			case "blue":
-				bag.blue = max(bag.blue, spec.n)
-			default:
-				panic("unknown color")
-			}
+func minBag(game []Draw) Draw {
+	bag := Draw{}
+	for _, draw := range game {
+		for color, n := range draw {
+			bag[color] = max(bag[color], n)
 		}
 	}
 	return bag
 }
 
-func power(bag Bag) int {
-	return bag.red * bag.blue * bag.green
+func power(bag Draw) int {
+	if bag["red"] == 0 || bag["green"] == 0 || bag["blue"] == 0 {
+		panic("zero color")
+	}
+	return bag["red"] * bag["green"] * bag["blue"]
 }
 
 func main() {
@@ -72,8 +44,7 @@ func main() {
 	}
 	input := string(file)
 
-	bag := Bag{red: 12, green: 13, blue: 14}
-
+	bag := Draw{"red": 12, "green": 13, "blue": 14}
 	games := strings.Split(input, "\n")
 	sum := 0
 	sum2 := 0
@@ -94,10 +65,10 @@ func main() {
 
 		draws := strings.Split(drawsStr, "; ")
 
-		var game [][]Spec
+		var game []Draw
 		for _, draw := range draws {
 			specs := strings.Split(draw, ", ")
-			game = append(game, make([]Spec, 0))
+			game = append(game, Draw{})
 			for _, spec := range specs {
 				nStr, color, found := strings.Cut(spec, " ")
 				if !found {
@@ -107,7 +78,7 @@ func main() {
 				if err != nil {
 					panic(err)
 				}
-				game[len(game) - 1] = append(game[len(game) - 1], Spec{n: n, color: color})
+				game[len(game)-1][color] = n
 			}
 		}
 		if possible(bag, game) {
@@ -115,6 +86,6 @@ func main() {
 		}
 		sum2 += power(minBag(game))
 	}
-	fmt.Println(sum)	
-	fmt.Println(sum2)	
+	fmt.Println(sum)
+	fmt.Println(sum2)
 }
