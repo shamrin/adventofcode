@@ -16,32 +16,26 @@ func main() {
 	}
 	input := string(file)
 
-	def := []struct {
-		n int
-		s string
-	}{
-		{n: 1, s: "one"},
-		{n: 2, s: "two"},
-		{n: 3, s: "three"},
-		{n: 4, s: "four"},
-		{n: 5, s: "five"},
-		{n: 6, s: "six"},
-		{n: 7, s: "seven"},
-		{n: 8, s: "eight"},
-		{n: 9, s: "nine"},
+	numbers := map[string]int{
+		"one": 1,
+		"two": 2,
+		"three": 3,
+		"four": 4,
+		"five": 5,
+		"six": 6,
+		"seven": 7,
+		"eight": 8,
+		"nine": 9,
 	}
-
-	char := regexp.MustCompile("[a-zA-Z]+")
 	lines := strings.Split(input, "\n")
 	sum := 0
 	for _, originalLine := range lines {
 		line := strings.Clone(originalLine)
-		for _, d := range def {
-			line = strings.ReplaceAll(line, d.s, d.s+strconv.Itoa(d.n)+d.s)
+		for s, n := range numbers {
+			line = strings.ReplaceAll(line, s, s+strconv.Itoa(n)+s)
 		}
-		onlyDigits := char.ReplaceAllString(line, "")
-		var number int
-		number, err := strconv.Atoi(string(onlyDigits[0]) + string(onlyDigits[len(onlyDigits)-1]))
+		digits := regexp.MustCompile("[a-zA-Z]+").ReplaceAllString(line, "")
+		number, err := strconv.Atoi(digits[:1] + digits[len(digits)-1:])
 		if err != nil {
 			panic(err)
 		}
