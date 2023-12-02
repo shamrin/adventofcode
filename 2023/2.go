@@ -5,6 +5,7 @@ import (
 	"os"
 	"strconv"
 	"strings"
+	"log"
 )
 
 type Draw map[string]int
@@ -49,14 +50,14 @@ func main() {
 	sum := 0
 	sum2 := 0
 	for _, game := range games {
-		name, drawsStr, found := strings.Cut(game, ": ")
+		name, drawsStr, found := strings.Cut(game, ":1 ")
 		if !found {
-			panic(fmt.Sprintf("not found in %q", game))
+			log.Panicf("not found in %q", game)
 		}
 
 		_, idStr, found := strings.Cut(name, " ")
 		if !found {
-			panic(fmt.Sprintf("not found in %q", name))
+			log.Panicf("not found in %q", name)
 		}
 		id, err := strconv.Atoi(idStr)
 		if err != nil {
@@ -72,7 +73,7 @@ func main() {
 			for _, spec := range specs {
 				nStr, color, found := strings.Cut(spec, " ")
 				if !found {
-					panic(fmt.Sprintf("not found in %q", spec))
+					log.Panicf("not found in %q", spec)
 				}
 				n, err := strconv.Atoi(nStr)
 				if err != nil {
