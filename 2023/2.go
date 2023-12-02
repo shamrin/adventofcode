@@ -50,7 +50,7 @@ func main() {
 	sum := 0
 	sum2 := 0
 	for _, game := range games {
-		name, drawsStr, found := strings.Cut(game, ":1 ")
+		name, drawsStr, found := strings.Cut(game, ": ")
 		if !found {
 			log.Panicf("not found in %q", game)
 		}
