@@ -2,15 +2,16 @@ package main
 
 import (
 	"fmt"
+	"os"
 	"strings"
 )
 
-type Cell struct{
+type Cell struct {
 	r int
 	c int
 }
 
-type S map[Cell]rune
+type Schematic map[Cell]rune
 
 type Connection struct {
 	number Cell
@@ -18,95 +19,83 @@ type Connection struct {
 }
 
 func isSymbol(r rune) bool {
-	result := !isDigit(r) && r != '.'
-	// fmt.Printf("  isSymbol(%s) => %t\n", string(r), result)
-	return result
+	return !isDigit(r) && r != '.' && r != 0
 }
 
 func isDigit(r rune) bool {
 	return '0' <= r && r <= '9'
 }
 
-func adjacentSymbols(s S, r, c int) []Cell {
-	result := []Cell{}
+func adjacentSymbols(s Schematic, r, c int) []Cell {
+	symbols := []Cell{}
 	for _, i := range []int{-1, 0, +1} {
 		for _, j := range []int{-1, 0, +1} {
 			if i != 0 || j != 0 {
-				if isSymbol(s[Cell{r+i, c+j}]) {
-					// fmt.Printf("adjacentToSymbol(%d, %d) => true\n", r, c)
-					result = append(result, Cell{r+i, c+j})
+				if isSymbol(s[Cell{r + i, c + j}]) {
+					symbols = append(symbols, Cell{r + i, c + j})
 				}
 			}
 		}
 	}
-	// fmt.Printf("adjacentToSymbol(%d, %d) => false\n", r, c)
-	return result
+	return symbols
 }
 
 func main() {
-	// file, err := os.ReadFile("3.txt")
-	// if err != nil {
-	// 	panic(err)
-	// }
-	// input := string(file)
-	input := `467..114..
-...*......
-..35..633.
-......#...
-617*......
-.....+.58.
-..592.....
-......755.
-...$.*....
-.664.598..`
+	file, err := os.ReadFile("3.txt")
+	if err != nil {
+		panic(err)
+	}
+	input := string(file)
 
-	// connections := map[Connection]bool{}
-
-	sum := 0
-	nrows := 0
-	ncols := 0
-	s := S{}
-	for r, line := range strings.Split(input, "\n") {
-		nrows = max(r+1, nrows)
+	connections := map[Connection]bool{}
+	numbers := map[Cell]int{}
+	s := Schematic{}
+	rows := strings.Split(input, "\n")
+	ncols := len(rows[0])
+	for r, line := range rows {
 		for c, ch := range line {
-			ncols = max(c+1, ncols)
 			s[Cell{r, c}] = ch
 		}
-		s[Cell{r, -1}] = '.'
-		s[Cell{r, ncols}] = '.'
 	}
-	for c := -1; c <= ncols; c++ {
-		s[Cell{-1, c}] = '.'
-		s[Cell{nrows, c}] = '.'
-	}
-
-	for r := 0; r < nrows; r++ {
-		n := -1
-		// var number Cell
-		keep := false
+	for r := 0; r < len(rows); r++ {
+		var cell *Cell
 		for c := 0; c < ncols; c++ {
 			ch := s[Cell{r, c}]
 			if isDigit(ch) {
-				if len(adjacentSymbols(s, r, c)) > 0 {
-					keep = true
+				if cell == nil {
+					cell = &Cell{r, c}
 				}
-				if n == -1 {
-					// number = Cell{r, c}
-					n = 0
+				for _, symbol := range adjacentSymbols(s, r, c) {
+					connections[Connection{*cell, symbol}] = true
 				}
-				n = n*10 + int(ch - '0')
+				numbers[*cell] = numbers[*cell]*10 + int(ch-'0')
 			}
-			if !isDigit(ch) || c == ncols - 1 {
-				if n != -1 {
-					if keep {
-						sum += n
-					}
-					n = -1
-				}
-				keep = false
+			if !isDigit(ch) || c == ncols-1 {
+				cell = nil
 			}
 		}
 	}
 
+	partNumbers := map[Cell]bool{}
+	gears := map[Cell][]Cell{}
+	for connection := range connections {
+		partNumbers[connection.number] = true
+		if s[connection.symbol] == '*' {
+			gears[connection.symbol] = append(gears[connection.symbol], connection.number)
+		}
+	}
+
+	sum := 0
+	for number := range partNumbers {
+		sum += numbers[number]
+	}
+	fmt.Println(sum)
+
+	sum = 0
+	for _, ns := range gears {
+		if len(ns) == 2 {
+			sum += numbers[ns[0]] * numbers[ns[1]]
+		}
+	}
 	fmt.Println(sum)
 }
