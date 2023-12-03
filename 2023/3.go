@@ -12,10 +12,10 @@ type Cell struct{
 
 type S map[Cell]rune
 
-// type Connection struct {
-// 	number Cell
-// 	symbol Cell
-// }
+type Connection struct {
+	number Cell
+	symbol Cell
+}
 
 func isSymbol(r rune) bool {
 	result := !isDigit(r) && r != '.'
@@ -27,19 +27,20 @@ func isDigit(r rune) bool {
 	return '0' <= r && r <= '9'
 }
 
-func adjacentToSymbol(s S, r, c int) bool {
+func adjacentSymbols(s S, r, c int) []Cell {
+	result := []Cell{}
 	for _, i := range []int{-1, 0, +1} {
 		for _, j := range []int{-1, 0, +1} {
 			if i != 0 || j != 0 {
 				if isSymbol(s[Cell{r+i, c+j}]) {
 					// fmt.Printf("adjacentToSymbol(%d, %d) => true\n", r, c)
-					return true
+					result = append(result, Cell{r+i, c+j})
 				}
 			}
 		}
 	}
 	// fmt.Printf("adjacentToSymbol(%d, %d) => false\n", r, c)
-	return false
+	return result
 }
 
 func main() {
@@ -86,8 +87,7 @@ func main() {
 		for c := 0; c < ncols; c++ {
 			ch := s[Cell{r, c}]
 			if isDigit(ch) {
-				if adjacentToSymbol(s, r, c) {
-					// connections[Connection{number, Cell{r,c}}]
+				if len(adjacentSymbols(s, r, c)) > 0 {
 					keep = true
 				}
 				if n == -1 {
