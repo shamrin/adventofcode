@@ -59,19 +59,19 @@ func main() {
 	connections := map[Connection]bool{}
 	numbers := map[Cell]int{}
 	for r := 0; r < len(rows); r++ {
-		var cell *Cell
+		reading, cell := false, Cell{}
 		for c := 0; c < ncols; c++ {
 			ch := s[Cell{r, c}]
 			if isDigit(ch) {
-				if cell == nil {
-					cell = &Cell{r, c}
+				if !reading {
+					reading, cell = true, Cell{r, c}
 				}
 				for _, symbol := range adjacentSymbols(s, r, c) {
-					connections[Connection{*cell, symbol}] = true
+					connections[Connection{cell, symbol}] = true
 				}
-				numbers[*cell] = numbers[*cell]*10 + int(ch-'0')
+				numbers[cell] = numbers[cell]*10 + int(ch-'0')
 			} else {
-				cell = nil
+				reading = false
 			}
 		}
 	}
