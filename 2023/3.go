@@ -78,16 +78,16 @@ func main() {
 
 	partNumbers := map[Cell]bool{}
 	gears := map[Cell][]Cell{}
-	for connection := range connections {
-		partNumbers[connection.number] = true
-		if s[connection.symbol] == '*' {
-			gears[connection.symbol] = append(gears[connection.symbol], connection.number)
+	for conn := range connections {
+		partNumbers[conn.number] = true
+		if s[conn.symbol] == '*' {
+			gears[conn.symbol] = append(gears[conn.symbol], conn.number)
 		}
 	}
 
 	sum := 0
-	for number := range partNumbers {
-		sum += numbers[number]
+	for cell := range partNumbers {
+		sum += numbers[cell]
 	}
 	fmt.Println(sum)
 
