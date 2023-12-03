@@ -47,8 +47,6 @@ func main() {
 	}
 	input := string(file)
 
-	connections := map[Connection]bool{}
-	numbers := map[Cell]int{}
 	s := Schematic{}
 	rows := strings.Split(input, "\n")
 	ncols := len(rows[0])
@@ -57,6 +55,9 @@ func main() {
 			s[Cell{r, c}] = ch
 		}
 	}
+
+	connections := map[Connection]bool{}
+	numbers := map[Cell]int{}
 	for r := 0; r < len(rows); r++ {
 		var cell *Cell
 		for c := 0; c < ncols; c++ {
@@ -69,8 +70,7 @@ func main() {
 					connections[Connection{*cell, symbol}] = true
 				}
 				numbers[*cell] = numbers[*cell]*10 + int(ch-'0')
-			}
-			if !isDigit(ch) || c == ncols-1 {
+			} else {
 				cell = nil
 			}
 		}
