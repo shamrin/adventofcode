@@ -8,7 +8,7 @@ import (
 	"strings"
 )
 
-func IntPow(n, m int) int {
+func intPow(n, m int) int {
 	if m < 0 {
 		panic("negative power")
 	}
@@ -22,7 +22,7 @@ func IntPow(n, m int) int {
 	return result
 }
 
-func Ints(text string) []int {
+func ints(text string) []int {
 	ints := []int{}
 	for _, m := range regexp.MustCompile(`-?[0-9]+`).FindAllString(text, -1) {
 		n, err := strconv.Atoi(m)
@@ -53,11 +53,11 @@ func main() {
 	for i, line := range lines {
 		win, have, _ := strings.Cut(line, "|")
 		winning := map[int]bool{}
-		for _, w := range Ints(win)[1:] {
+		for _, w := range ints(win)[1:] {
 			winning[w] = true
 		}
 		won := 0
-		for _, h := range Ints(have) {
+		for _, h := range ints(have) {
 			if winning[h] {
 				won++
 			}
@@ -66,7 +66,7 @@ func main() {
 		if won == 0 {
 			points = 0
 		} else {
-			points = IntPow(2, won-1)
+			points = intPow(2, won-1)
 		}
 		sum += points
 		for j := 0; j < won && i+j+1 < len(counts); j++ {
