@@ -9,6 +9,9 @@ import (
 )
 
 func IntPow(n, m int) int {
+	if m < 0 {
+		panic("negative power")
+	}
 	if m == 0 {
 		return 1
 	}
