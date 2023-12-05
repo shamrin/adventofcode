@@ -60,7 +60,6 @@ func difference(a, b R) []R {
 }
 
 func part1(sections [][]Map, seeds []uint32) uint32 {
-	x := slices.Clone(seeds)
 	nw := 4
 	for _, maps := range sections {
 		var wg sync.WaitGroup
@@ -68,10 +67,10 @@ func part1(sections [][]Map, seeds []uint32) uint32 {
 			wg.Add(1)
 			go func(w int, maps []Map) {
 				defer wg.Done()
-				for i := w; i < len(x); i += nw {
+				for i := w; i < len(seeds); i += nw {
 					for _, m := range maps {
-						if m.src.start <= x[i] && x[i] < m.src.end {
-							x[i] += m.dst - m.src.start
+						if m.src.start <= seeds[i] && seeds[i] < m.src.end {
+							seeds[i] += m.dst - m.src.start
 							break
 						}
 					}
@@ -80,7 +79,7 @@ func part1(sections [][]Map, seeds []uint32) uint32 {
 		}
 		wg.Wait()
 	}
-	return slices.Min(x)
+	return slices.Min(seeds)
 }
 
 func part2Brute(sections [][]Map, specs []uint32) uint32 {
@@ -141,7 +140,7 @@ func main() {
 	input := string(file)
 
 	lines := strings.Split(input, "\n\n")
-	specs := ints[uint32](lines[0])
+	in := ints[uint32](lines[0])
 
 	sections := [][]Map{}
 	for i, section := range lines[1:] {
@@ -154,7 +153,7 @@ func main() {
 		}
 	}
 
-	fmt.Println(part1(sections, specs))
-	fmt.Println(part2(sections, specs))
-	// fmt.Println(part2Brute(sections, specs))
+	fmt.Println(part1(sections, slices.Clone(in)))
+	fmt.Println(part2(sections, in))
+	// fmt.Println(part2Brute(sections, in))
 }
