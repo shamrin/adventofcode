@@ -27,10 +27,7 @@ func ints[T Integer](text string) []T {
 }
 
 type R struct{ start, end uint32 }
-type Map struct {
-	dst uint32
-	src R
-}
+type Map struct{ dst, src R }
 
 func intersection(a, b R) []R {
 	start := max(a.start, b.start)
@@ -70,7 +67,7 @@ func part1(sections [][]Map, seeds []uint32) uint32 {
 				for i := w; i < len(seeds); i += nw {
 					for _, m := range maps {
 						if m.src.start <= seeds[i] && seeds[i] < m.src.end {
-							seeds[i] += m.dst - m.src.start
+							seeds[i] += m.dst.start - m.src.start
 							break
 						}
 					}
@@ -110,8 +107,8 @@ func part2(sections [][]Map, specs []uint32) uint32 {
 			for _, m := range maps {
 				if inter := intersection(r, m.src); len(inter) > 0 {
 					next = append(next, R{
-						start: inter[0].start + m.dst - m.src.start,
-						end:   inter[0].end + m.dst - m.src.start,
+						start: inter[0].start + m.dst.start - m.src.start,
+						end:   inter[0].end + m.dst.start - m.src.start,
 					})
 					rs = append(rs, difference(r, m.src)...)
 					handled = true
@@ -149,7 +146,7 @@ func main() {
 		for _, r := range ranges[1:] {
 			m := ints[uint32](r)
 			dst, src, length := m[0], m[1], m[2]
-			sections[i] = append(sections[i], Map{dst, R{src, src + length}})
+			sections[i] = append(sections[i], Map{R{dst, dst + length}, R{src, src + length}})
 		}
 	}
 
