@@ -55,100 +55,100 @@ func difference(a, b R) []R {
 	return r
 }
 
-func main() {
-	var input string
+func part1(M [][][]uint32, seeds []uint32) uint32 {
+	x := slices.Clone(seeds)
+	nw := 4
+	for _, section := range M {
+		var wg sync.WaitGroup
+		for w := 0; w < nw; w++ {
+			wg.Add(1)
+			go func(w int, section [][]uint32) {
+				defer wg.Done()
+				for i := w; i < len(x); i += nw {
+					for _, m := range section {
+						dst, src, length := m[0], m[1], m[2]
+						if src <= x[i] && x[i] < src+length {
+							x[i] += dst - src
+							break
+						}
+					}
+				}
+			}(w, section)
+		}
+		wg.Wait()
+	}
+	return slices.Min(x)
+}
 
+func part2Brute(maps [][][]uint32, specs []uint32) uint32 {
+	sum := uint32(0)
+	for i := 0; i < len(specs)-1; i += 2 {
+		sum += specs[i+1]
+	}
+	seeds := make([]uint32, 0, sum)
+	for i := 0; i < len(specs)-1; i += 2 {
+		for s := specs[i]; s < specs[i]+specs[i+1]; s++ {
+			seeds = append(seeds, s)
+		}
+	}
+	return part1(maps, seeds)
+}
+
+func part2(maps [][][]uint32, specs []uint32) uint32 {
+	rs := []R{}
+	for i := 0; i < len(specs)-1; i += 2 {
+		rs = append(rs, R{specs[i], specs[i] + specs[i+1]})
+	}
+	for _, section := range maps {
+		next := make([]R, 0)
+		for len(rs) > 0 {
+			handled := false
+			var r R
+			r, rs = rs[0], rs[1:]
+			for _, m := range section {
+				dst, src, length := m[0], m[1], m[2]
+				srcR := R{src, src + length}
+				if inter := intersection(r, srcR); len(inter) > 0 {
+					next = append(next, R{inter[0].start + dst - src, inter[0].end + dst - src})
+					rs = append(rs, difference(r, srcR)...)
+					handled = true
+					break
+				}
+			}
+			if !handled {
+				next = append(next, r)
+			}
+		}
+		rs = next
+	}
+	starts := []uint32{}
+	for _, r := range rs {
+		starts = append(starts, r.start)
+	}
+	return slices.Min(starts)
+}
+
+func main() {
 	// file, err := os.ReadFile("5ex.txt")
 	file, err := os.ReadFile("5.txt")
 	if err != nil {
 		panic(err)
 	}
-	input = string(file)
+	input := string(file)
 
 	lines := strings.Split(input, "\n\n")
-	specsInput := ints[uint32](lines[0])
-	rs := map[R]bool{}
+	specs := ints[uint32](lines[0])
 
-	sum := uint32(0)
-	for j := 0; j < len(specsInput)-1; j += 2 {
-		sum += specsInput[j+1]
-	}
-	seeds := make([]uint32, 0, sum)
-	for j := 0; j < len(specsInput)-1; j += 2 {
-		rs[R{specsInput[j], specsInput[j] + specsInput[j+1]}] = true
-		for s := specsInput[j]; s < specsInput[j]+specsInput[j+1]; s++ {
-			seeds = append(seeds, s)
-		}
-	}
-
-	M := [][][]uint32{}
-	for i, block := range lines[1:] {
-		ranges := strings.Split(block, "\n")
-		M = append(M, [][]uint32{})
+	maps := [][][]uint32{}
+	for i, section := range lines[1:] {
+		ranges := strings.Split(section, "\n")
+		maps = append(maps, [][]uint32{})
 		for _, range_ := range ranges[1:] {
-			M[i] = append(M[i], ints[uint32](range_))
+			maps[i] = append(maps[i], ints[uint32](range_))
 		}
 	}
 
-	nw := 4
-	for _, block := range M {
-		newRs := []R{}
-		oldRs := map[R]bool{}
-		for _, m := range block {
-			for r := range rs {
-				dst, src, length := m[0], m[1], m[2]
-				srcR := R{src, src + length}
-				if inter := intersection(r, srcR); len(inter) > 0 {
-					delete(rs, r)
-					newRs = append(newRs, R{inter[0].start + dst - src, inter[0].end + dst - src})
-					for _, rest := range difference(r, srcR) {
-						oldRs[rest] = true
-					}
-				}
-			}
-		}
-		for _, m := range block {
-			for r := range oldRs {
-				dst, src, length := m[0], m[1], m[2]
-				srcR := R{src, src + length}
-				if inter := intersection(r, srcR); len(inter) > 0 {
-					delete(oldRs, r)
-					newRs = append(newRs, R{inter[0].start + dst - src, inter[0].end + dst - src})
-					for _, rest := range difference(r, srcR) {
-						oldRs[rest] = true
-					}
-				}
-			}
-		}
-		for _, r := range newRs {
-			rs[r] = true
-		}
-		for r := range oldRs {
-			rs[r] = true
-		}
-
-		var wg sync.WaitGroup
-		for w := 0; w < nw; w++ {
-			wg.Add(1)
-			go func(w int, block [][]uint32) {
-				defer wg.Done()
-				for i := w; i < len(seeds); i += nw {
-					for _, m := range block {
-						dst, src, length := m[0], m[1], m[2]
-						if src <= seeds[i] && seeds[i] < src+length {
-							seeds[i] += dst - src
-							break
-						}
-					}
-				}
-			}(w, block)
-		}
-		wg.Wait()
-	}
-	fmt.Println("brute", slices.Min(seeds))
-	starts := []uint32{}
-	for r := range rs {
-		starts = append(starts, r.start)
-	}
-	fmt.Println("fast", slices.Min(starts))
+	fmt.Println(part1(maps, specs))
+	fmt.Println(part2(maps, specs))
+	// fmt.Println(part2Brute(maps, specs))
 }
