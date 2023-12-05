@@ -1,6 +1,7 @@
 package main
 
 import (
+	"cmp"
 	"fmt"
 	"os"
 	"regexp"
@@ -121,11 +122,7 @@ func part2(sections [][]Map, specs []uint32) uint32 {
 		}
 		rs = next
 	}
-	starts := []uint32{}
-	for _, r := range rs {
-		starts = append(starts, r.start)
-	}
-	return slices.Min(starts)
+	return slices.MinFunc(rs, func(a, b R) int { return cmp.Compare(a.start, b.start) }).start
 }
 
 func main() {
