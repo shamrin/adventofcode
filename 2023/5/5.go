@@ -67,7 +67,7 @@ func part1(sections [][]Map, seeds []uint32) uint32 {
 		var wg sync.WaitGroup
 		for w := 0; w < nw; w++ {
 			wg.Add(1)
-			go func(w int, maps []Map) {
+			go func(w int) {
 				defer wg.Done()
 				for i := w; i < len(seeds); i += nw {
 					for _, m := range maps {
@@ -77,7 +77,7 @@ func part1(sections [][]Map, seeds []uint32) uint32 {
 						}
 					}
 				}
-			}(w, maps)
+			}(w)
 		}
 		wg.Wait()
 	}
