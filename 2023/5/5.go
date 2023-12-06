@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"os"
 	"regexp"
+	"runtime"
 	"slices"
 	"strconv"
 	"strings"
@@ -61,7 +62,7 @@ func difference(a, b R) []R {
 }
 
 func part1(sections [][]Map, seeds []uint32) uint32 {
-	nw := 4
+	nw := runtime.NumCPU()
 	for _, maps := range sections {
 		var wg sync.WaitGroup
 		for w := 0; w < nw; w++ {
