@@ -105,21 +105,18 @@ func part2(sections [][]Map, specs []uint32) uint32 {
 	}
 	for _, maps := range sections {
 		next := make([]R, 0)
+	ConsumeRs:
 		for len(rs) > 0 {
-			handled := false
 			r := rs[0]
 			rs = rs[1:]
 			for _, m := range maps {
 				if inter := intersection(r, m.src); len(inter) > 0 {
 					next = append(next, R{inter[0].start + m.shift, inter[0].end + m.shift})
 					rs = append(rs, difference(r, m.src)...)
-					handled = true
-					break
+					continue ConsumeRs
 				}
 			}
-			if !handled {
-				next = append(next, r)
-			}
+			next = append(next, r)
 		}
 		rs = next
 	}
