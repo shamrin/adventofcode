@@ -107,16 +107,15 @@ func solve(lines []string, cards string, handType func(hand Hand) int) int {
 	}
 
 	slices.SortFunc(hands, func(a, b Hand) int {
-		c := cmp.Compare(handType(a), handType(b))
-		if c != 0 {
+		if c := cmp.Compare(handType(a), handType(b)); c != 0 {
 			return c
 		}
 		for i := range a.cards {
-			if a.cards[i] != b.cards[i] {
-				return cmp.Compare(a.cards[i], b.cards[i])
+			if c := cmp.Compare(a.cards[i], b.cards[i]); c != 0 {
+				return c
 			}
 		}
-		panic("oops")
+		return 0
 	})
 
 	sum := 0
