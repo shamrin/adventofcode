@@ -9,13 +9,6 @@ import (
 	"strings"
 )
 
-var cards = "  23456789TJQKA"
-
-type Hand struct {
-	cards [5]int
-	bid   int
-}
-
 const (
 	highCard = iota
 	onePair
@@ -25,6 +18,11 @@ const (
 	fourOfAKind
 	fiveOfAKind
 )
+
+type Hand struct {
+	cards [5]int
+	bid   int
+}
 
 func handType(hand Hand) int {
 	labels := map[int]int{}
@@ -70,23 +68,38 @@ func handType(hand Hand) int {
 	}
 }
 
-func main() {
-	// file, err := os.ReadFile("7ex.txt")
-	file, err := os.ReadFile("7.txt")
-	if err != nil {
-		panic(err)
-	}
-	input := string(file)
+var cards = "  23456789TJQKA"
+var cardsWithJoker = " J23456789TQKA"
 
-	lines := strings.Split(input, "\n")
+func strengthen(hand Hand) Hand {
+	labels := map[int]int{}
+	joker := strings.Index(cardsWithJoker, "J")
+	maxCount, maxCard := 0, 0
+	for _, c := range hand.cards {
+		if c != joker {
+			labels[c]++
+			if labels[c] > maxCount {
+				maxCount, maxCard = labels[c], c
+			}
+		}
+	}
+	for i, c := range hand.cards {
+		if c == joker {
+			hand.cards[i] = maxCard
+		}
+	}
+	return hand
+}
+
+func solve(lines []string, cards string, handType func(hand Hand) int) int {
 	hands := []Hand{}
 	for _, line := range lines {
-		spec, bidS, _ := strings.Cut(line, " ")
-		bid, err := strconv.Atoi(bidS)
-		if err != nil {
+		var hand Hand
+		var err  error
+		spec, bid, _ := strings.Cut(line, " ")
+		if hand.bid, err = strconv.Atoi(bid); err != nil {
 			panic(err)
 		}
-		hand := Hand{bid: bid}
 		for i, r := range spec {
 			hand.cards[i] = strings.IndexRune(cards, r)
 		}
@@ -110,6 +123,17 @@ func main() {
 	for rank, hand := range hands {
 		sum += (rank + 1) * hand.bid
 	}
+	return sum
+}
 
-	fmt.Println(sum)
+func main() {
+	// file, err := os.ReadFile("7ex.txt")
+	file, err := os.ReadFile("7.txt")
+	if err != nil {
+		panic(err)
+	}
+	input := string(file)
+	lines := strings.Split(input, "\n")
+	fmt.Println(solve(lines, cards, handType))
+	fmt.Println(solve(lines, cardsWithJoker, func(hand Hand) int { return handType(strengthen(hand)) }))
 }
