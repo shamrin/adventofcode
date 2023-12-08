@@ -20,6 +20,15 @@ func words(text string) []string {
 	return ss
 }
 
+func arrived(nodes []string) bool {
+	for _, node := range nodes {
+		if node[2] != 'Z' {
+			return false
+		}
+	}
+	return true
+}
+
 func main() {
 	// file, err := os.ReadFile("7ex.txt")
 	file, err := os.ReadFile("8.txt")
@@ -27,30 +36,44 @@ func main() {
 		panic(err)
 	}
 	input := string(file)
+	input = `LR
+
+11A = (11B, XXX)
+11B = (XXX, 11Z)
+11Z = (11B, XXX)
+22A = (22B, XXX)
+22B = (22C, 22C)
+22C = (22Z, 22Z)
+22Z = (22B, 22B)
+XXX = (XXX, XXX)`
 
 	lines := strings.Split(input, "\n")
 	instructions := lines[0]
-	fmt.Println(instructions)
 	net := map[string]Node{}
 	for _, line := range lines[2:] {
 		if len(line) == 0 { continue }
 		ws := words(line)
 		net[ws[0]] = Node{ws[1], ws[2]}
 	}
-	fmt.Println(net)
 
-	node := "AAA"
+	nodes := []string{}
+	for node := range net {
+		if node[2] == 'A' {
+			nodes = append(nodes, node)
+		}
+	}
 	steps := 0
-	for ; node != "ZZZ"; steps++ {
-		dir := instructions[steps % len(instructions)]
-		// fmt.Println(node, string(dir))
-		switch dir {
-		case 'L':
-			node = net[node].left
-		case 'R':
-			node = net[node].right
-		default:
-			panic("oops")
+	for ; !arrived(nodes); steps++ {
+		for i, node := range nodes {
+			dir := instructions[steps % len(instructions)]
+			switch dir {
+			case 'L':
+				nodes[i] = net[node].left
+			case 'R':
+				nodes[i] = net[node].right
+			default:
+				panic("oops")
+			}
 		}
 	}
 	fmt.Println(steps)
