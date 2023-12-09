@@ -35,12 +35,12 @@ func zeroes(history []int) bool {
 	return true
 }
 
-func solve(lines []string, reverse bool) int {
+func solve(lines []string, future bool) int {
 	sum := 0
 	for _, line := range lines {
 		history := [][]int{}
 		ns := ints(line)
-		if reverse {
+		if future {
 			slices.Reverse(ns)
 		}
 		history = append(history, ns)
