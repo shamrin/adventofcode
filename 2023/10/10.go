@@ -45,6 +45,48 @@ func print(field map[xy]rune) {
 	}
 }
 
+func next(field map[xy]rune, pos xy, prev xy) xy {
+	switch field[pos] {
+	case '│':
+		if pos.y-1 == prev.y {
+			pos.y++
+		} else {
+			pos.y--
+		}
+	case '─':
+		if pos.x-1 == prev.x {
+			pos.x++
+		} else {
+			pos.x--
+		}
+	case '└':
+		if pos.y-1 == prev.y {
+			pos.x++
+		} else {
+			pos.y--
+		}
+	case '┘':
+		if pos.x-1 == prev.x {
+			pos.y--
+		} else {
+			pos.x--
+		}
+	case '┐':
+		if pos.x-1 == prev.x {
+			pos.y++
+		} else {
+			pos.x--
+		}
+	case '┌':
+		if pos.y+1 == prev.y {
+			pos.x++
+		} else {
+			pos.y++
+		}
+	}
+	return pos
+}
+
 func main() {
 	file, err := os.ReadFile("10.txt")
 	if err != nil {
@@ -86,59 +128,13 @@ func main() {
 		field[start] = '┌'
 	}
 
-	// walk the loop (part 1)
+	// walk the loop and count steps (part 1)
 	steps := 0
-	loop := map[xy]bool{}
-	prev := xy{-2, -2}
-	x, y := start.x, start.y
-	for {
-		pos := xy{x, y}
+	loop := map[xy]bool{start: true}
+	for prev, pos := start, next(field, start, xy{}); pos != start; prev, pos = pos, next(field, pos, prev) {
 		loop[pos] = true
-		switch field[pos] {
-		case '│':
-			if y-1 == prev.y {
-				y++
-			} else {
-				y--
-			}
-		case '─':
-			if x-1 == prev.x {
-				x++
-			} else {
-				x--
-			}
-		case '└':
-			if y-1 == prev.y {
-				x++
-			} else {
-				y--
-			}
-		case '┘':
-			if x-1 == prev.x {
-				y--
-			} else {
-				x--
-			}
-		case '┐':
-			if x-1 == prev.x {
-				y++
-			} else {
-				x--
-			}
-		case '┌':
-			if y+1 == prev.y {
-				x++
-			} else {
-				y++
-			}
-		}
-		if start.x == x && start.y == y {
-			break
-		}
 		steps++
-		prev = pos
 	}
-	fmt.Println(steps/2 + 1)
 
 	// erase all non-loop elements
 	for pos := range field {
@@ -146,7 +142,6 @@ func main() {
 			field[pos] = '.'
 		}
 	}
-	// print(field)
 
 	// count inner elements (part 2)
 	nrows, ncols := size(field)
@@ -158,6 +153,7 @@ func main() {
 			case '.':
 				if topIn {
 					ins++
+					field[xy{x, y}] = 'I'
 				}
 			case '│':
 				topIn = !topIn
@@ -169,5 +165,8 @@ func main() {
 			}
 		}
 	}
+
+	print(field)
+	fmt.Println(steps/2 + 1)
 	fmt.Println(ins)
 }
