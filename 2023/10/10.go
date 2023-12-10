@@ -143,26 +143,26 @@ func main() {
 	nrows, ncols := size(field)
 	ins := 0
 	for y := 0; y < nrows; y++ {
-		up, do := false, false
+		topIn, bottomIn := false, false
 		for x := 0; x < ncols; x++ {
 			c := field[xy{x, y}]
 			switch {
 			case !loop[xy{x, y}]:
-				if up {
+				if topIn {
 					ins++
 				}
 			case c == '│':
-				up = !up
-				do = !do
+				topIn = !topIn
+				bottomIn = !bottomIn
 			case c == '─':
 			case c == '└':
-				up = !up
+				topIn = !topIn
 			case c == '┘':
-				up = !up
+				topIn = !topIn
 			case c == '┐':
-				do = !do
+				bottomIn = !bottomIn
 			case c == '┌' || c == 'S': // hardcoded
-				do = !do
+				bottomIn = !bottomIn
 			default:
 				panic("oops")
 			}
