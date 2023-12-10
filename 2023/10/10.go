@@ -17,15 +17,15 @@ var boxchars = map[rune]rune{
 	'S': 'S',
 }
 
-// var boldchars = map[rune]rune{
-// 	'│': '┃',
-// 	'─': '━',
-// 	'└': '┗',
-// 	'┘': '┛',
-// 	'┐': '┓',
-// 	'┌': '┏',
-// 	'S': '┏', // hardcoded
-// }
+var boldchars = map[rune]rune{
+	'│': '┃',
+	'─': '━',
+	'└': '┗',
+	'┘': '┛',
+	'┐': '┓',
+	'┌': '┏',
+	'S': '┏', // hardcoded
+}
 
 type xy struct {
 	x int
@@ -63,20 +63,6 @@ func main() {
 		panic(err)
 	}
 	input := string(file)
-	// 	input = `..F7.
-	// .FJ|.
-	// SJ.L7
-	// |F--J
-	// LJ...`
-	// 	input = `...........
-	// .S-------7.
-	// .|F-----7|.
-	// .||.....||.
-	// .||.....||.
-	// .|L-7.F-J|.
-	// .|..|.|..|.
-	// .L--J.L--J.
-	// ...........`
 
 	pairs := []string{}
 	for from, to := range boxchars {
@@ -98,60 +84,59 @@ func main() {
 			x++
 		}
 	}
-	print(field)
 
 	steps := 0
 	loop := map[xy]bool{}
 	prev := start
 	loop[start] = true
-	pos := xy{start.x + 1, start.y} // hardcoded!
-	for pos != start {
-		nextPrev := pos
+	x, y := start.x+1, start.y // hardcoded
+	for (xy{x, y} != start) {
+		pos := xy{x, y}
 		loop[pos] = true
 		switch field[pos] {
 		case 'S':
 			panic("oops")
 		case '│':
-			if (xy{pos.x, pos.y - 1}) == prev {
-				pos.y++
+			if y-1 == prev.y {
+				y++
 			} else {
-				pos.y--
+				y--
 			}
 		case '─':
-			if (xy{pos.x - 1, pos.y}) == prev {
-				pos.x++
+			if x-1 == prev.x {
+				x++
 			} else {
-				pos.x--
+				x--
 			}
 		case '└':
-			if (xy{pos.x, pos.y - 1}) == prev {
-				pos.x++
+			if y-1 == prev.y {
+				x++
 			} else {
-				pos.y--
+				y--
 			}
 		case '┘':
-			if (xy{pos.x - 1, pos.y}) == prev {
-				pos.y--
+			if x-1 == prev.x {
+				y--
 			} else {
-				pos.x--
+				x--
 			}
 		case '┐':
-			if (xy{pos.x - 1, pos.y}) == prev {
-				pos.y++
+			if x-1 == prev.x {
+				y++
 			} else {
-				pos.x--
+				x--
 			}
 		case '┌':
-			if (xy{pos.x, pos.y + 1}) == prev {
-				pos.x++
+			if y+1 == prev.y {
+				x++
 			} else {
-				pos.y++
+				y++
 			}
 		default:
 			panic("oops")
 		}
 		steps++
-		prev = nextPrev
+		prev = pos
 	}
 	fmt.Println(steps/2 + 1)
 
@@ -161,48 +146,22 @@ func main() {
 		up, do := false, false
 		for x := 0; x < ncols; x++ {
 			c := field[xy{x, y}]
-			if !loop[xy{x, y}] {
-				if up != do {
-					panic("oops")
-				}
+			switch {
+			case !loop[xy{x, y}]:
 				if up {
-					field[xy{x, y}] = 'i'
 					ins++
-				} else {
-					field[xy{x, y}] = 'o'
 				}
-				continue
-			}
-			switch c {
-			case '│':
-				if up != do {
-					panic("oops")
-				}
+			case c == '│':
 				up = !up
 				do = !do
-			case '─':
-				if up == do {
-					panic("oops")
-				}
-			case '└':
-				if up != do {
-					panic("oops")
-				}
+			case c == '─':
+			case c == '└':
 				up = !up
-			case '┘':
-				if up == do {
-					panic("oops")
-				}
+			case c == '┘':
 				up = !up
-			case '┐':
-				if up == do {
-					panic("oops")
-				}
+			case c == '┐':
 				do = !do
-			case '┌', 'S': // hardcoded
-				if up != do {
-					panic("oops")
-				}
+			case c == '┌' || c == 'S': // hardcoded
 				do = !do
 			default:
 				panic("oops")
