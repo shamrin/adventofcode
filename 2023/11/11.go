@@ -19,7 +19,6 @@ func abs(x int) int {
 func solve(gs []G, k int) int {
 	gs = slices.Clone(gs)
 	nr, nc := 0, 0
-	grows, gcols := map[int]bool{}, map[int]bool{}
 	for _, g := range gs {
 		if g.col+1 > nc {
 			nc = max(g.col+1, nc)
@@ -27,40 +26,30 @@ func solve(gs []G, k int) int {
 		if g.row+1 > nr {
 			nr = max(g.row+1, nr)
 		}
+	}
+	grows, gcols := make([]bool, nr), make([]bool, nc)
+	for _, g := range gs {
 		grows[g.row] = true
 		gcols[g.col] = true
 	}
-	emptyrows, emptycols := []int{}, []int{}
-	for r := 0; r < nr; r++ {
-		if !grows[r] {
-			emptyrows = append(emptyrows, r)
-		}
-	}
-	for c := 0; c < nc; c++ {
-		if !gcols[c] {
-			emptycols = append(emptycols, c)
-		}
-	}
-	slices.Sort(emptyrows)
-	slices.Sort(emptycols)
-	slices.Reverse(emptyrows)
-	slices.Reverse(emptycols)
-
-	for _, er := range emptyrows {
-		for i := range gs {
-			if gs[i].row > er {
-				gs[i].row += k - 1
+	for row := len(grows) - 1; row >= 0; row-- {
+		if !grows[row] {
+			for i := range gs {
+				if gs[i].row > row {
+					gs[i].row += k - 1
+				}
 			}
 		}
 	}
-	for _, ec := range emptycols {
-		for i := range gs {
-			if gs[i].col > ec {
-				gs[i].col += k - 1
+	for col := len(gcols) - 1; col >= 0; col-- {
+		if !gcols[col] {
+			for i := range gs {
+				if gs[i].col > col {
+					gs[i].col += k - 1
+				}
 			}
 		}
 	}
-
 	s := 0
 	for i, g1 := range gs {
 		for _, g2 := range gs[i+1:] {
