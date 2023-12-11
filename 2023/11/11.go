@@ -20,12 +20,8 @@ func solve(gs []G, k int) int {
 	gs = slices.Clone(gs)
 	nr, nc := 0, 0
 	for _, g := range gs {
-		if g.col+1 > nc {
-			nc = max(g.col+1, nc)
-		}
-		if g.row+1 > nr {
-			nr = max(g.row+1, nr)
-		}
+        nc = max(g.col+1, nc)
+        nr = max(g.row+1, nr)
 	}
 	grows, gcols := make([]bool, nr), make([]bool, nc)
 	for _, g := range gs {
