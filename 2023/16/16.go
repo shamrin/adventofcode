@@ -1,8 +1,10 @@
 package main
 
 import (
+	"flag"
 	"fmt"
 	"os"
+	"runtime/pprof"
 	"strings"
 )
 
@@ -17,6 +19,8 @@ var right = Vec{+1, 0}
 var left = Vec{-1, 0}
 var down = Vec{0, +1}
 var up = Vec{0, -1}
+
+var cpuprofile = flag.String("cpuprofile", "", "write cpu profile to file")
 
 func beam(pass map[Beam]bool, grid map[Tile]rune, tile Tile, dir Vec) {
 	tile = Tile{tile.x + dir.x, tile.y + dir.y}
@@ -81,6 +85,16 @@ func energy(grid map[Tile]rune, tile Tile, dir Vec) int {
 }
 
 func main() {
+	flag.Parse()
+	if *cpuprofile != "" {
+		f, err := os.Create(*cpuprofile)
+		if err != nil {
+			panic(err)
+		}
+		pprof.StartCPUProfile(f)
+		defer pprof.StopCPUProfile()
+	}
+
 	file, err := os.ReadFile("16.txt")
 	if err != nil {
 		panic(err)
@@ -97,7 +111,6 @@ func main() {
 	fmt.Println(energy(grid, Tile{-1, 0}, right))
 
 	ny, nx := len(lines), len(lines[0])
-	fmt.Println(nx, ny)
 	maxEnergy := 0
 	for y := 0; y < ny; y++ {
 		maxEnergy = max(maxEnergy, energy(grid, Tile{-1, y}, right))
